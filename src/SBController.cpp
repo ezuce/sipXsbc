@@ -17,7 +17,7 @@ namespace OSS {
 namespace SIP {
 namespace B2BUA {
 
-
+std::string SBController::_jsDefaultTargetDomain;
 
 SBController::SBController() :
   SIPB2BTransactionManager(2, 1024),
@@ -331,6 +331,18 @@ v8::Handle<v8::Value> SBController::jsMsgGetInterfacePort(const v8::Arguments& a
   return v8::Integer::New(addr.getPort());
 }
 
+void SBController::setDefaultTargetDomain(const std::string& targetDomain)
+{
+  SBController::_jsDefaultTargetDomain = targetDomain;
+}
+
+v8::Handle<v8::Value> SBController::jsMsgGetDefaultTargetDomain(const v8::Arguments& args)
+{
+  if(SBController::_jsDefaultTargetDomain.empty())
+    return v8::Undefined();
+  return v8::String::New(SBController::_jsDefaultTargetDomain.c_str());
+}
+
 void SBController::jsRegisterExports(OSS_HANDLE objectTemplate)
 {
   v8::Handle<v8::ObjectTemplate>& global = *(static_cast<v8::Handle<v8::ObjectTemplate>*>(objectTemplate));
@@ -340,6 +352,7 @@ void SBController::jsRegisterExports(OSS_HANDLE objectTemplate)
   global->Set(v8::String::New("msgGetSourcePort"), v8::FunctionTemplate::New(&SBController::jsMsgGetSourcePort));
   global->Set(v8::String::New("msgGetInterfaceAddress"), v8::FunctionTemplate::New(&SBController::jsMsgGetInterfaceAddress));
   global->Set(v8::String::New("msgGetInterfacePort"), v8::FunctionTemplate::New(&SBController::jsMsgGetInterfacePort));
+  global->Set(v8::String::New("msgGetDefaultTargetDomain"), v8::FunctionTemplate::New(&SBController::jsMsgGetDefaultTargetDomain));
 }
 
 } } } // OSS::SIP::B2BUA
