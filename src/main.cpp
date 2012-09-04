@@ -8,7 +8,7 @@
 #include "sqa/ServiceOptions.h"
 
 #ifndef SIPX_CONFDIR
-#define SIPX_CONFDIR "~/etc/sipxpbx/"
+#define SIPX_CONFDIR "/etc/sipxpbx/"
 #endif
 
 static void catch_global()
@@ -91,8 +91,6 @@ static void initLogger(ServiceOptions& service)
 static void initDataStore(OSS::SIP::B2BUA::SBController& sbc)
 {
   OSS::SIP::B2BUA::SBController::DataStoreConfig datastore;
-  datastore.redisHost = "127.0.0.1";
-  datastore.redisPort = 6379;
   try
   {
     std::ostringstream sqaconfig;
@@ -113,11 +111,6 @@ static void initDataStore(OSS::SIP::B2BUA::SBController& sbc)
 static void initHandler(OSS::SIP::B2BUA::SBController& sbc, ServiceOptions& service)
 {
   OSS::SIP::B2BUA::SBController::HandlerConfig handlers;
-  handlers.globalScriptsDirectory = SIPX_CONFDIR "/sipxsbc/globals";
-  handlers.inboundRequestScript = SIPX_CONFDIR "/sipxsbc/inboundRequest.js";
-  handlers.outboundRequestScript = SIPX_CONFDIR "/sipxsbc/outboundRequest.js";
-  handlers.outboundResponseScript = SIPX_CONFDIR "/sipxsbc/outboundResponse.js";
-  handlers.routeRequestScript = SIPX_CONFDIR "/sipxsbc/routeRequest.js";
   try
   {
     std::ostringstream config;
