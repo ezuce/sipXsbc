@@ -1,0 +1,70 @@
+# Copyright (c) 2012 eZuce, Inc. All rights reserved.
+
+#
+# sipxsbc configuration and process management
+#
+bundle agent sipxsbc {
+  methods:
+    sipxsbc::
+      "any" usebundle => "sipxsbc_config";
+    any::
+      "any" usebundle => "sipxsbc_running";
+}
+
+bundle agent sipxsbc_config {
+  files:
+    any::
+      "$(sipx.SIPX_CONFDIR)/sipxsbc.ini"
+        comment => "sipxsbc configuration $(this.promiser)",
+        create => "true",
+        perms => m("644"),
+        edit_line => sipxsbc_ini_contents,
+        classes => if_repaired("restart_sipxsbc");
+}
+
+bundle edit_line sipxsbc_ini_contents {
+  insert_lines:
+    any::
+      "$(sipx.SIPX_CFDATA)/$(sipx.location_id)/sipxsbc.ini.part"
+        insert_type => "file";
+      "target-domain=$(sipx.domain)";
+      "globalScriptsDirectory=$(sipx.SIPX_CONFDIR)/sipxsbc/globals";
+      "inboundRequestScript=$(sipx.SIPX_CONFDIR)/sipxsbc/handlers/inboundRequest.js";
+      "outboundRequestScript=$(sipx.SIPX_CONFDIR)/sipxsbc/handlers/outboundRequest.js";
+      "outboundResponseScript=$(sipx.SIPX_CONFDIR)/sipxsbc/handlers/outboundResponse.js";
+      "routeRequestScript=$(sipx.SIPX_CONFDIR)/sipxsbc/handlers/routeRequest.js";
+  delete_lines:
+    any::
+      ".*";
+}
+
+bundle agent sipxsbc_running {
+  vars:
+    any::
+      "service_command" string => "$(sipx.SIPX_BINDIR)/sipxsbc";
+
+  methods:
+    any::
+      "any" usebundle => find_sipxservice_by_command("$(service_command)","sipxsbc_running");
+    !src.sipxsbc::
+      "any" usebundle => rh_chkconfig_status("sipxsbc on");
+    !src.!sipxsbc::
+      "any" usebundle => rh_chkconfig_status("sipxsbc off");
+
+  commands:
+    (!sipxsbc|stop_sipxecs).sipxsbc_running::
+      "$(sipx.SIPX_SERVICEDIR)/sipxsbc"
+        comment => "stop sipxsbc",
+        args => "stop";
+
+    sipxsbc.!sipxsbc_running.!stop_sipxecs::
+      "$(sipx.SIPX_SERVICEDIR)/sipxsbc"
+        comment => "start sipxsbc",
+        args => "start";
+
+    sipxsbc.sipxsbc_running.(restart_sipxsbc|restart_sipxecs)::
+      "$(sipx.SIPX_SERVICEDIR)/sipxsbc"
+        comment => "restart sipxsbc",
+        args => "restart";
+}
+
