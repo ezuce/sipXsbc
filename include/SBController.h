@@ -78,6 +78,7 @@ public:
   //
   // Javascript exports
   //
+  void setDefaultTargetDomain(const std::string& targetDomain);
 protected:
   static OSS::SIP::SIPMessage* jsUnwrapRequest(const v8::Arguments& args);
   static std::string jsValToString(const v8::Handle<v8::Value>& str);
@@ -90,7 +91,8 @@ protected:
   static v8::Handle<v8::Value> jsMsgGetInterfaceAddress(const v8::Arguments& args);
   static v8::Handle<v8::Value> jsMsgGetInterfacePort(const v8::Arguments& args);
   static void jsRegisterExports(OSS_HANDLE objectTemplate);
-
+  static v8::Handle<v8::Value> jsMsgGetDefaultTargetDomain(const v8::Arguments& args);
+  static std::string _jsDefaultTargetDomain;
 protected:
   SBCDataStore* _pDataStore;
 };
