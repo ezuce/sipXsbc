@@ -23,6 +23,7 @@ BuildRequires: hiredis-devel
 BuildRequires: sipxsqa-devel >= %version
 BuildRequires: poco-devel
 BuildRequires: libconfig-devel
+BuildRequires: libtool-ltdl-devel
 
 Requires: poco-crypto
 Requires: poco-data
