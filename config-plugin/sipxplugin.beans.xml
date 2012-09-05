@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+  <bean id="sipxsbcHook" class="org.sipfoundry.sipxconfig.site.SimplePluginHook">
+    <property name="hookId" value="SipxsbcHook"/>
+    <property name="featureId" value="sipxsbc"/>
+  </bean>
+
+  <bean id="sipxsbc" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+    <property name="target" ref="sipxsbcImpl"/>
+    <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.sipxsbc.Sipxsbc"/>
+  </bean>
+
+  <bean id="sipxsbcStrings" class="org.springframework.context.support.ResourceBundleMessageSource">
+    <property name="basename">
+      <value>sipxsbc-plugin</value>
+    </property>
+  </bean>
+
+  <bean id="sipxsbcImpl" class="org.sipfoundry.sipxconfig.sipxsbc.SipxsbcImpl">
+    <property name="settingsDao">
+      <bean parent="beanWithSettingsDao">
+        <property name="target">
+          <bean parent="beanWithSettingsDaoImpl">
+            <constructor-arg value="org.sipfoundry.sipxconfig.sipxsbc.SipxsbcSettings"/>
+          </bean>
+        </property>
+      </bean>
+    </property>
+  </bean>
+
+  <bean id="sipxsbcSettings" class="org.sipfoundry.sipxconfig.sipxsbc.SipxsbcSettings" parent="settingsBean">
+  </bean>
+
+  <bean id="sipxsbcConfig" class="org.sipfoundry.sipxconfig.sipxsbc.SipxsbcConfig">
+    <property name="sipxsbc" ref="sipxsbc"/>
+  </bean>
+
+</beans>

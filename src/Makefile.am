@@ -1,12 +1,9 @@
-## Process this file with automake to produce Makefile.in
-include $(top_srcdir)/config/subdir.am
-
-SUBDIRS = .
+include $(top_srcdir)/config/utility.am
 
 INCLUDES = \
 	-I$(top_srcdir)/include
 
-lib_LTLIBRARIES = libsipxsbc.la
+bin_PROGRAMS = sipxsbc
 
 ## Libtool version info - update only immediately before a release
 # Current - increment if any interfaces are added, removed, or changed
@@ -44,51 +41,26 @@ common_libs = \
 	-lssl \
 	-lresolv
 
-common_cxx_flags = \
-	-DOSSLIBS_TMPDIR=\"@OSSLIBS_TMPDIR@\" \
-	-DOSSLIBS_CONFDIR=\"@OSSLIBS_CONFDIR@\" \
-	-DOSSLIBS_RUNDIR=\"@OSSLIBS_RUNDIR@\" \
-	-DOSSLIBS_LOGDIR=\"@OSSLIBS_LOGDIR@\" \
+sipxsbc_CXXFLAGS = \
+	-DOSSLIBS_TMPDIR=\"@SIPX_TMPDIR@\" \
+	-DOSSLIBS_CONFDIR=\"@SIPX_CONFDIR@\" \
+	-DOSSLIBS_RUNDIR=\"@SIPX_RUNDIR@\" \
+	-DOSSLIBS_LOGDIR=\"@SIPX_LOGDIR@\" \
 	-DOSSAPP_LIB_VERSION=${version_Current}.${version_Revision}.${version_Age}
+	-fno-gcse -O0 -fno-implement-inlines -fno-default-inline \
+	-I$(top_srcdir)/include
 
-libsipxsbc_la_LDFLAGS = \
-	-version-info ${version_Current}:${version_Revision}:${version_Age}
-
-
-libsipxsbc_la_LIBADD = ${common_libs}
-	
-
-
-# this is helpful if you're debugging something with lots of inlines (like the UtlLink code)
-# 		-fno-gcse -O0 -fno-implement-inlines -fno-default-inline
-libsipxsbc_la_CXXFLAGS = \
-	${common_cxx_flags} \
-	-fno-gcse -O0 -fno-implement-inlines -fno-default-inline
-
-#libsipxsbc_la_CFLAGS = 	-D_BSD_SOURCE -std=gnu99 -Wno-uninitialized -g -O2 -MT
-
-
-libsipxsbc_la_SOURCES =  \
+sipxsbc_SOURCES =  \
+	main.cpp \
 	SBCDataStore.cpp \
 	SBController.cpp
 
-
-bin_PROGRAMS = sipXsbc
-
-
-sipXsbc_CXXFLAGS = \
-	${common_cxx_flags} \
-	-fno-gcse -O0 -fno-implement-inlines -fno-default-inline
-
-sipXsbc_LDFLAGS = \
-	-rdynamic
-
-sipXsbc_LDADD = \
-	@OSSLIBSCORE_LIBS@ \
-	libsipxsbc.la \
+sipxsbc_LDADD = \
+	@OSSCORE_LIBS@ \
 	${common_libs}
 
-sipXsbc_SOURCES = main.cpp
+sipxsbc_LDFLAGS = \
+    -rdynamic
 	
 
 

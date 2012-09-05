@@ -1,0 +1,78 @@
+#!/bin/bash
+# sipxsbc - Startup script for sipxsbc
+
+# chkconfig: 35 85 15
+# description: sipxsbc is part of openUC
+# processname: sipxsbc
+
+# Copyright (C) 2012 eZuce Corp
+
+. /etc/rc.d/init.d/functions || exit 1
+. @SIPX_LIBEXECDIR@/sipx-utils.sh || exit 1
+
+prog=sipxsbc
+exec="@SIPX_BINDIR@/${prog}"
+pidfile="@SIPX_RUNDIR@/sipxsbc.pid"
+SIPXSBC_CONFIG="@SIPX_CONFDIR@/sipxsbc.ini"
+SIPXSBC_OPTS="--log-file @SIPX_LOGDIR@/sipxsbc.log --config-file $SIPXSBC_CONFIG --pid-file $pidfile"
+
+[ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
+
+start() {
+    [ -x $exec ] || exit 5
+    [ -f $config ] || exit 6
+    if [ -n "${NoFork}" ] ; then
+      runuser - @SIPXPBXUSER@ -c "$exec $SIPXSBC_OPTS"
+    else
+      echo -n $"Starting $prog: "
+      daemon --user @SIPXPBXUSER@ --pidfile $pidfile $exec $SIPXSBC_OPTS --daemonize
+      Status=$?
+      echo_success
+    fi
+}
+
+stop() {
+  echo -n $"Stopping sipxsbc: "
+  # can take a while to shutdown because of relay
+  # dont wait too long as service availability is in jeopardy
+  killproc -p "${pidfile}" -d 10 "${exec}"
+  Status=$?
+  echo
+  [ $Status -eq 0 ] && rm -f "${pidfile}"
+}
+
+restart() {
+  stop
+  start
+}
+
+case "$1" in
+  nofork)
+    NoFork=1
+    start
+    ;;
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  restart|reload|force-reload)
+    restart
+    ;;
+  condrestart)
+    [ -f ${pidfile} ] && restart || :
+    ;;
+  status)
+    status -p "${pidfile}" "${prog}"
+    Status=$?
+    ;;
+  configtest)
+    configtest
+    ;; 
+  *)
+    echo "Usage: $0 {start|stop|status|restart|reload|force-reload|condrestart|nofork}"
+    Status=1
+esac
+
+exit $Status
