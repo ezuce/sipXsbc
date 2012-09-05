@@ -16,7 +16,7 @@ BuildRequires: sipxconfig >= %version
 BuildRequires: zeromq-devel
 BuildRequires: sipxsqa-devel >= %version
 BuildRequires: sipxregistry-devel >= %version
-BuildRequires: oss-core-devel
+BuildRequires: oss_core-devel
 
 Requires: sipxsqa >= %version
 Requires: oss-core >= %version
