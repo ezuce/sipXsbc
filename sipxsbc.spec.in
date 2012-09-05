@@ -11,6 +11,7 @@ Url: http://www.sipfoundry.org
 
 BuildRequires: automake
 BuildRequires: java-devel >= 1.6
+BuildRequires: pcre-devel >= 4.5
 BuildRequires: sipxsupervisor >= %version
 BuildRequires: sipxconfig >= %version
 BuildRequires: zeromq-devel
@@ -21,6 +22,7 @@ BuildRequires: v8-devel
 BuildRequires: hiredis-devel
 BuildRequires: sipxsqa-devel >= %version
 BuildRequires: poco-devel
+BuildRequires: libconfig-devel
 
 Requires: poco-crypto
 Requires: poco-data
