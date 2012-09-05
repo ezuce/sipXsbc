@@ -40,7 +40,7 @@ Requires: poco-util
 Requires: poco-xml
 Requires: poco-zip
 Requires: sipxsqa >= %version
-Requires: oss-core
+Requires: oss_core
 Requires: v8
 Requires: hiredis
 Requires: openssl >= 0.9.7a
