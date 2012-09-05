@@ -17,9 +17,11 @@ BuildRequires: zeromq-devel
 BuildRequires: sipxsqa-devel >= %version
 BuildRequires: sipxregistry-devel >= %version
 BuildRequires: oss_core-devel
+BuildRequires: v8-devel
 
 Requires: sipxsqa >= %version
 Requires: oss-core >= %version
+Requires: v8
 
 Source: %name-%version.tar.gz
 Prefix: %_prefix
