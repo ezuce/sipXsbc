@@ -1,3 +1,3 @@
-nobase_include_HEADERS = \
+noinst_HEADERS = \
 	SBCDataStore.h \
 	SBController.h
