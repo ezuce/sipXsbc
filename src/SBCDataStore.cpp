@@ -1,4 +1,5 @@
 
+#include "OSS/Logger.h"
 #include "SBCDataStore.h"
 
 namespace OSS {
@@ -69,18 +70,30 @@ void SBCDataStore::removeAllDialogs(const std::string& callId)
 
 bool SBCDataStore::persistReg(const RegData& regData)
 {
+  if (regData.key.empty() || regData.aor.empty() || regData.contact.empty())
+  {
+    OSS_LOG_ERROR("Invalid registration record.");
+    return false;
+  }
   json::Object data;
   regData.toJsonObject(data);
+  OSS_LOG_INFO("Persisting registration " << regData.key << " for AOR: " << regData.aor << " Binding: " << regData.contact);
   _registry.set(regData.key, data, regData.expires);
-  return false;
+  return true;
 }
 
 bool SBCDataStore::getOneReg(const std::string& regId, RegData& regData)
 {
+  OSS_LOG_INFO("SBCDataStore::getOneReg " << regId);
   json::Object data;
   if (!_registry.get(regId, data))
+  {
+    OSS_LOG_INFO("Unable to find registration for " << regId );
     return false;
+  }
+  OSS_LOG_INFO("SBCDataStore::getOneReg " << regId << " FOUND");
   regData.fromJsonObject(data);
+  OSS_LOG_INFO("Found registration for " << regData.key << " AOR: " << regData.aor << " Binding: " << regData.contact);
   return true;
 }
 
