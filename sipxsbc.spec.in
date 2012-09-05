@@ -24,6 +24,8 @@ BuildRequires: sipxsqa-devel >= %version
 BuildRequires: poco-devel
 BuildRequires: libconfig-devel
 BuildRequires: libtool-ltdl-devel
+BuildRequires: libmcrypt-devel
+BuildRequires: openssl-devel
 
 Requires: poco-crypto
 Requires: poco-data
@@ -41,6 +43,9 @@ Requires: sipxsqa >= %version
 Requires: oss-core >= %version
 Requires: v8
 Requires: hiredis
+Requires: openssl >= 0.9.7a
+Requires: pcre >= 4.5
+Requires: libconfig
 
 Source: %name-%version.tar.gz
 Prefix: %_prefix
