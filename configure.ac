@@ -14,7 +14,6 @@ SFAC_INIT_FLAGS
 SFAC_LIB_PORT
 SFAC_LIB_COMMSERVER
 OSSCORE_LIB
-CHECK_ODBC
 m4_include([config/java.m4])
 m4_include([config/java2.m4])
 AC_PROG_JAVA_CC([javac])
