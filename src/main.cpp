@@ -71,7 +71,7 @@ static void initLogger(ServiceOptions& service)
 
       if (service.hasOption("log-no-compress", true))
         compress = false;
-      
+
       if (service.hasOption("log-purge-count"))
         service.getOption("log-purge-count", purgeCount, purgeCount);
 
@@ -142,7 +142,7 @@ static void initHandler(OSS::SIP::B2BUA::SBController& sbc, ServiceOptions& serv
   catch(...)
   {
   }
-  
+
   sbc.initHandler(handlers);
 }
 
@@ -152,6 +152,7 @@ static void initListeners(OSS::SIP::B2BUA::SBController& sbc, ServiceOptions& se
   OSS::SIP::B2BUA::SBController::ListenerInfo tcp, udp;
 
   std::string listenerAddress;
+  std::string externalAddress;
   int listenerPort = 5060;
   transport.tcpPortBase = 30000;
   transport.tcpPortMax = 40000;
@@ -174,6 +175,7 @@ static void initListeners(OSS::SIP::B2BUA::SBController& sbc, ServiceOptions& se
     {
       int portBase = transport.tcpPortBase;
       int portMax = transport.tcpPortMax;
+      configOptions.getOption("external-address", externalAddress);
       configOptions.getOption("listener-address", listenerAddress);
       configOptions.getOption("listener-port", listenerPort, listenerPort);
       configOptions.getOption("tcp-port-base", portBase, portBase);
@@ -195,9 +197,11 @@ static void initListeners(OSS::SIP::B2BUA::SBController& sbc, ServiceOptions& se
   }
 
   udp.address = listenerAddress;
+  udp.externalAddress = externalAddress;
   udp.port = listenerPort;
   udp.proto = "udp";
   tcp.address = listenerAddress;
+  tcp.externalAddress = externalAddress;
   tcp.port = listenerPort;
   tcp.proto = "tcp";
   transport.listeners.push_back(udp);
@@ -227,7 +231,7 @@ int main(int argc, char** argv)
   service.addOptionInt("log-purge-count", ": Specify the number of archive to maintain.");
   service.parseOptions();
   initLogger(service);
-  
+
 
   OSS::SIP::B2BUA::SBController sbc;
   //
