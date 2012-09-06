@@ -1,0 +1,88 @@
+Name: @PACKAGE@
+Version: @VERSION@
+Release: @PACKAGE_REVISION@
+
+Summary: sipXsbc/Cisco integration
+License: AGPL
+Group: Telcommunications
+Vendor: SIPfoundry
+Packager: Douglas Hubler <dhubler@ezuce.com>
+Url: http://www.sipfoundry.org
+
+BuildRequires: automake
+BuildRequires: java-devel >= 1.6
+BuildRequires: pcre-devel >= 4.5
+BuildRequires: sipxsupervisor >= %version
+BuildRequires: sipxconfig >= %version
+BuildRequires: zeromq-devel
+BuildRequires: sipxsqa-devel >= %version
+BuildRequires: sipxregistry-devel >= %version
+BuildRequires: oss_core-devel
+BuildRequires: v8-devel
+BuildRequires: hiredis-devel
+BuildRequires: sipxsqa-devel >= %version
+BuildRequires: poco-devel
+BuildRequires: libconfig-devel
+BuildRequires: libtool-ltdl-devel
+BuildRequires: libmcrypt-devel
+BuildRequires: openssl-devel
+
+Requires: poco-crypto
+Requires: poco-data
+Requires: poco-foundation
+Requires: poco-mysql
+Requires: poco-net
+Requires: poco-netssl
+Requires: poco-odbc
+Requires: poco-pagecompiler
+Requires: poco-sqlite
+Requires: poco-util
+Requires: poco-xml
+Requires: poco-zip
+Requires: sipxsqa >= %version
+Requires: oss_core
+Requires: v8
+Requires: hiredis
+Requires: openssl >= 0.9.7a
+Requires: pcre >= 4.5
+Requires: libconfig
+
+Source: %name-%version.tar.gz
+Prefix: %_prefix
+BuildRoot: %{_tmppath}/%name-%version-root
+
+%description
+SBC - Cisco integration.
+
+%package config
+Requires: sipxconfig >= %version
+Group: Telcommunications
+Vendor: SIPfoundry
+Summary: Administration UI for sipXsbc
+
+%description config
+Administration UI for sipXsbc
+
+%prep
+%setup -q
+
+%build
+%configure --enable-rpmbuild @SIPX_RPM_CONFIGURE_OPTIONS@
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(644,root,root,755)
+%{_datadir}/sipxecs/cfinputs/plugin.d/sipxsbc.cf
+%attr(755,root,root) %{_sysconfdir}/init.d/sipxsbc
+%attr(755,root,root) %{_bindir}/sipxsbc
+
+%files config
+%{_sysconfdir}/sipxpbx/sipxsbc/*
+%{_datadir}/java/sipXecs/sipXconfig/plugins/sipxsbc-config.jar
