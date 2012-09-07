@@ -28,6 +28,7 @@ import org.sipfoundry.sipxconfig.firewall.DefaultFirewallRule;
 import org.sipfoundry.sipxconfig.firewall.FirewallManager;
 import org.sipfoundry.sipxconfig.firewall.FirewallProvider;
 import org.sipfoundry.sipxconfig.firewall.FirewallRule;
+import org.sipfoundry.sipxconfig.redis.Redis;
 import org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao;
 import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
 import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
@@ -53,8 +54,7 @@ public class SipxsbcImpl implements Sipxsbc, FeatureProvider, AddressProvider, P
 
     @Override
     public void featureChangePrecommit(FeatureManager manager, FeatureChangeValidator validator) {
-        // TODO Auto-generated method stub
-        
+        validator.requiredOnSameHost(SIPXSBC_FEATURE, Redis.FEATURE);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class SipxsbcImpl implements Sipxsbc, FeatureProvider, AddressProvider, P
     public Collection<DefaultFirewallRule> getFirewallRules(FirewallManager manager) {
         return DefaultFirewallRule.rules(
                 Arrays.asList(SIPXSBC_LISTENER_ADDRESS, SIPXSBC_TRANSPORT_ADDRESS),
-                FirewallRule.SystemId.CLUSTER);
+                FirewallRule.SystemId.PUBLIC, true);
     }
 
     @Override
