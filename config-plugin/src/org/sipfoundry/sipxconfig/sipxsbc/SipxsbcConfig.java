@@ -48,6 +48,7 @@ public class SipxsbcConfig implements ConfigProvider {
             try {
                 KeyValueConfiguration config = KeyValueConfiguration.equalsSeparated(wtr);
                 config.write("listener-address", location.getAddress());
+                config.write("external-address", location.getPublicAddress());
                 config.writeSettings(settings.getSettings());
             } finally {
                 IOUtils.closeQuietly(wtr);
