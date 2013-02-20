@@ -11,11 +11,14 @@
 #include "OSS/SIP/SIPFrom.h"
 #include "OSS/SIP/SIPURI.h"
 #include "OSS/SIP/SIPContact.h"
+#include "OSS/SIP/B2BUA/SIPB2BScriptableHandler.h"
 
 
 namespace OSS {
 namespace SIP {
 namespace B2BUA {
+
+const int RTP_PROXY_THREAD_COUNT=10;
 
 std::string SBController::_jsDefaultTargetDomain;
 
@@ -41,6 +44,16 @@ bool SBController::initDataStore(DataStoreConfig& config)
   OSS_ASSERT(!_pDataStore);
   _pDataStore = new SBCDataStore(config.redisHost, config.redisPort);
   _pDataStore->registerDataStoreFunctions(*this);
+  
+  //
+  // Connect RTP Proxy to redis
+  //
+  std::vector<RedisClient::ConnectionInfo> connectionInfo;
+  RedisClient::ConnectionInfo conn;
+  conn.host = config.redisHost;
+  conn.port = config.redisPort;
+  connectionInfo.push_back(conn);
+  dynamic_cast<SIPB2BScriptableHandler*>(this)->rtpProxy().redisConnect(connectionInfo);
 }
 
 bool SBController::initListeners(ListenerConfig& config)
@@ -101,6 +114,7 @@ bool SBController::run()
 {
   stack().run();
   dynamic_cast<SIPB2BDialogStateManager*>(this)->run();
+  dynamic_cast<SIPB2BScriptableHandler*>(this)->rtpProxy().run(RTP_PROXY_THREAD_COUNT);
 }
 
 bool SBController::initHandler(HandlerConfig& config)
