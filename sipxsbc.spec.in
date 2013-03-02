@@ -25,6 +25,8 @@ BuildRequires: poco-devel
 BuildRequires: libconfig-devel
 BuildRequires: libtool-ltdl-devel
 BuildRequires: libmcrypt-devel
+BuildRequires: libpcap-devel
+BuildRequires: libdnet-devel
 BuildRequires: openssl-devel
 
 Requires: poco-crypto
