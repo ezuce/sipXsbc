@@ -66,7 +66,7 @@ public class SipxsbcImpl implements Sipxsbc, FeatureProvider, AddressProvider, P
     @Override
     public Collection<DefaultFirewallRule> getFirewallRules(FirewallManager manager) {
         return DefaultFirewallRule.rules(
-                Arrays.asList(SIPXSBC_LISTENER_ADDRESS, SIPXSBC_TRANSPORT_ADDRESS),
+                Arrays.asList(SIPXSBC_LISTENER_ADDRESS, SIPXSBC_TRANSPORT_ADDRESS, SIPXSBC_WS_LISTENER_ADDRESS),
                 FirewallRule.SystemId.PUBLIC, true);
     }
 

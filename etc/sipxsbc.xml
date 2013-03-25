@@ -38,6 +38,12 @@
       </type>
       <value>5060</value>
     </setting>
+    <setting name="ws-listener-port">
+      <type>
+        <integer />
+      </type>
+      <value>5062</value>
+    </setting>
     <setting name="tcp-port-base">
       <type>
         <integer />
