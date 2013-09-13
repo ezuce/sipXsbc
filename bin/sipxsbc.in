@@ -7,8 +7,8 @@
 
 # Copyright (C) 2012 eZuce Corp
 
-. /etc/rc.d/init.d/functions || exit 1
-. @SIPX_LIBEXECDIR@/sipx-utils.sh || exit 1
+. /etc/rc.d/init.d/functions || exit $ENOENT
+. @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; echo; exit $ENOENT; }
 
 prog=sipxsbc
 exec="@SIPX_BINDIR@/${prog}"
@@ -19,29 +19,53 @@ SIPXSBC_OPTS="--log-file @SIPX_LOGDIR@/sipxsbc.log --config-file $SIPXSBC_CONFIG
 [ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
 
 start() {
-    [ -x $exec ] || exit 5
-    [ -f $config ] || exit 6
-    if [ -n "${NoFork}" ] ; then
-      runuser - @SIPXPBXUSER@ -c "$exec $SIPXSBC_OPTS"
-    else
-      echo -n $"Starting $prog: "
-      daemon --user @SIPXPBXUSER@ --pidfile $pidfile $exec $SIPXSBC_OPTS --daemonize
+  [ -x $exec ] || { echo -n "$execError"; echo_failure; echo; exit $ENOEXEC; }
+  [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; echo; exit $ENOENT; }
+  if [ -n "${NoFork}" ] ; then
+    killAnyOrphans @SIPXPBXUSER@ $prog
+    runuser - @SIPXPBXUSER@ -c "$exec $SIPXSBC_OPTS"
+  else
+    checkRunningInstance @SIPXPBXUSER@ $prog > /dev/null
+    Status=$?
+    [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; echo; exit $ERUNNING; }
+
+    echo -n $"Starting $prog: "
+    daemon --user @SIPXPBXUSER@ --pidfile $pidfile $exec $SIPXSBC_OPTS --daemonize
+    Status=$?
+
+    if [ $# -gt 0 ]; then
+      #check if process spawned
+      checkRunningInstanceTimeout @SIPXPBXUSER@ $prog
       Status=$?
-      echo_success
+      [ $Status -eq 0 ] || { echo_failure; echo; exit $ESRCH; }
+      checkIfListening $prog
+      Status=$?
+      [ $Status -eq 0 ] || { echo_failure; echo; exit $ENOSCKT; }
+      [ $Status -eq 0 ] && { echo_success; echo; }
+    else
+      [ $Status -eq 0 ] && { echo_success; echo; }
+      [ $Status -eq 0 ] || { echo_failure; echo; }
     fi
+  fi
 }
 
 stop() {
   echo -n $"Stopping sipxsbc: "
   # can take a while to shutdown because of relay
   # dont wait too long as service availability is in jeopardy
-  killproc -p "${pidfile}" -d 10 "${exec}"
+  killproc -d 10 "${exec}"
   Status=$?
   echo
   [ $Status -eq 0 ] && rm -f "${pidfile}"
+  killAnyOrphans @SIPXPBXUSER@ $prog
 }
 
 restart() {
+  stop
+  start $withCheck
+}
+
+asyncrestart() {
   stop
   start
 }
@@ -60,18 +84,21 @@ case "$1" in
   restart|reload|force-reload)
     restart
     ;;
+  asyncrestart)
+    asyncrestart
+    ;;
   condrestart)
     [ -f ${pidfile} ] && restart || :
     ;;
   status)
-    status -p "${pidfile}" "${prog}"
+    checkRunningInstance @SIPXPBXUSER@ $prog
     Status=$?
     ;;
   configtest)
     configtest
-    ;; 
+    ;;
   *)
-    echo "Usage: $0 {start|stop|status|restart|reload|force-reload|condrestart|nofork}"
+    echo "Usage: $0 {start|stop|status|restart|asyncrestart|reload|force-reload|condrestart|nofork}"
     Status=1
 esac
 
