@@ -2,3 +2,5 @@ Makefile.in
 aclocal.m4
 autom4te.cache/
 configure
+src/config.h.in
+src/config.h.in~
