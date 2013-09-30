@@ -65,6 +65,6 @@ bundle agent sipxsbc_running {
     sipxsbc.sipxsbc_running.(restart_sipxsbc|restart_sipxecs)::
       "$(sipx.SIPX_SERVICEDIR)/sipxsbc"
         comment => "restart sipxsbc",
-        args => "restart";
+        args => "asyncrestart";
 }
 
