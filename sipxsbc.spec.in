@@ -18,6 +18,7 @@ BuildRequires: zeromq-devel
 BuildRequires: sipxsqa-devel >= %version
 BuildRequires: sipxregistry-devel >= %version
 BuildRequires: oss_core-devel
+BuildRequires: v8-devel
 BuildRequires: hiredis-devel
 BuildRequires: sipxsqa-devel >= %version
 BuildRequires: poco-devel
